@@ -1,2 +1,8 @@
 old/
 output/
+.RData
+.Rhistory
+software/vdjdb*
+slides/slides.aux
+software/latest-version.txt
+software/LICENSE.txt
