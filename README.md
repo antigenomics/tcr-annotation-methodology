@@ -24,7 +24,7 @@ install.packages(c(
 
 or install these packages manually.
 
-Download the tutorial by clicking the ``Clone or download`` button or execute
+Download the tutorial by clicking the ``Clone or download`` button above or execute
 
 ```bash
 git clone https://github.com/antigenomics/sciar-tutorial-2018.git
