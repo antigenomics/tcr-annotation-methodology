@@ -6,3 +6,10 @@ software/vdjdb*
 slides/slides.aux
 software/latest-version.txt
 software/LICENSE.txt
+slides/*.toc
+slides/*.log
+slides/*.out
+slides/*.snm
+slides/*.nav
+slides/*.gz
+slides/*.aux
