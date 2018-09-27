@@ -11,13 +11,14 @@ The following software is required to run the tutorial:
 * **R packeges** Run the following command in RStudio:
 
 ```R
-install.packages(
-	c("dplyr", "data.table", "ggplot2",
-      "forcats", "parallel", "stringr",
-      "reshape2", "igraph", "msa",
-      "stringdist", "broom", "GGally",
-      "ggseqlogo", "network", "gridExtra",
-      "cowplot")
+install.packages(c(
+	"dplyr", "data.table", "ggplot2",
+	"forcats", "parallel", "stringr",
+	"reshape2", "igraph", "msa",
+	"stringdist", "broom", "GGally",
+	"ggseqlogo", "network", "gridExtra",
+	"cowplot"
+	)
 )
 ```
 
