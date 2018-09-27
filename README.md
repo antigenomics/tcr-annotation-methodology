@@ -2,7 +2,7 @@
 
 ## **T-cell repertoire annotation and motif discovery** tutorial
 
-This tutorial provides a basic introduction to the inference of T-cells specific to certain epitopes and T-cell receptor sequence motif extraction from high-throughput sequencing data (RepSeq).
+This tutorial provides a basic introduction to the inference of T-cells specific to certain epitopes and T-cell receptor sequence motif extraction from high-throughput sequencing data (RepSeq). The users will get familiar with [VDJdb](https://github.com/antigenomics/vdjdb-db) and [VDJtools](https://github.com/mikessh/vdjtools) software and learn some tricks for working with TCR sequences and TCR sequence motifs in R.
 
 ![Splash](splash.png)
 
