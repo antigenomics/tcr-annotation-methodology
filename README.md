@@ -4,7 +4,7 @@
 
 This tutorial provides a basic introduction to the inference of T-cells specific to certain epitopes and T-cell receptor sequence motif extraction from high-throughput sequencing data (RepSeq).
 
-![Splash](samples.png)
+![Splash](splash.png)
 
 ### Prerequisites
 
