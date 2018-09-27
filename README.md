@@ -1,4 +1,10 @@
+[![CCBYSA](https://licensebuttons.net/l/by-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-sa/4.0/)
+
 ## **T-cell repertoire annotation and motif discovery** tutorial
+
+This tutorial provides a basic introduction to the inference of T-cells specific to certain epitopes and T-cell receptor sequence motif extraction from high-throughput sequencing data (RepSeq).
+
+![Splash](samples.png)
 
 ### Prerequisites
 
