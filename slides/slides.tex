@@ -62,10 +62,10 @@ We define a clonotype as a unique combination of Variable (V) and Joining (J) se
 \begin{frame}{TCR motif inference}
 Motif inference in present tutorial is based on the TCR neighbor enrichment test (\texttt{TCRNET}) implemented in \texttt{VDJtools}.\\~\
 
-\texttt{TCRNET} scans TCR sequence graph for nodes having a degree higher than expected by chance.
+\texttt{TCRNET} scans TCR sequence graph from a sample of interest and detects nodes having a degree higher than would be expected from placing a given node in the control sample.
 \end{frame}
 
-\begin{frame}{TCRNET}
+\begin{frame}{Test for TCR neighbor enrichment}
 Let $n_i^s$ be the number of clonotypes in sample $s$ that differ from $i$\textsuperscript{th} clonotype by no more than $d=1$ substitutions in the CDR3aa sequence.\footnote{They don't have to have the same V/J segments}\\~\
 
 Let $N_i^s$ be the total number of clonotypes having the same V/J segments as $i$\textsuperscript{th} clonotype in sample $s$.\\~\
