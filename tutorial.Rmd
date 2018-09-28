@@ -3,7 +3,7 @@ title: 'T-cell repertoire annotation and motif discovery'
 subtitle: 'A RepSeq data analysis tutorial in R'
 author: 'Mikhail Shugay'
 institute: 'Skolkovo Institute of Science and Technology'
-date: '29 October 2018, 2nd SCIAR meeting'
+date: '29 October 2018, 2nd SCAIR meeting'
 output:
   pdf_document: default
   html_document: default

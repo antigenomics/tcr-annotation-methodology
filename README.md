@@ -14,7 +14,7 @@ The following software is required to run the tutorial:
 
 * **RStudio** Can be installed from [rstudio.com](https://www.rstudio.com).
 
-* **R packeges** Run the following command in RStudio:
+* **R packages** Run the following command in RStudio:
 
 ```R
 install.packages(c(
