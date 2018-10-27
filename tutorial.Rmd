@@ -152,7 +152,7 @@ df.vdjdb <- df.vdjdb %>%
 df.vdjdb <- df.vdjdb %>%
   mutate(epi.name = paste(substr(str_split_fixed(mhc.a, "[,:]", 2)[,1], 5, 10),
                           substr(antigen.epitope, 1, 3)),
-         antigen.species = ifelse(startsWith(antigen.species,"DENV"),
+         antigen.species = ifelse(startsWith(antigen.species, "DENV"),
                                   "DengueVirus",
                                   antigen.species))
 
@@ -445,7 +445,7 @@ get_seqs_cid <- function(cc) {
 
 # multiple sequence alignment
 align_seqs <- function(seqs, cons = F) {
-  x <- seqs %>% AAStringSet %>% msa(method = "ClustalW") 
+  x <- seqs %>% AAStringSet %>% msa(method = "ClustalW")
   
   if (cons) {
     return(msaConsensusSequence(.x))

@@ -147,7 +147,7 @@ Control-4       & HIP04576    & \cellcolor[HTML]{9698ED}A*02 & A*30        & \ce
 
 \begin{frame}{Potential pitfalls}
 \begin{itemize}
-\item Repertoires are extremely diverse making TCR annotation an imbalanced classification problem. Even when matching against \texttt{VDJdb} with high specificity\footnote{According to VDJdb benchmark odds of matching the same epitope given $1$ substitution in CDR3$\beta$ are around $86$ to $1$} one will observe many false-positives.
+\item Repertoires are extremely diverse making TCR annotation an imbalanced classification problem. Even when matching against \texttt{VDJdb} with high specificity\footnote{According to VDJdb benchmark odds of matching the same epitope given $1$ substitution in CDR3$\beta$ are around $200+$ to $1$} one will observe many false-positives.
 \colorbox{yellow!50!white}{Use proper controls, e.g. naive T-cells}
 \item \texttt{TCRNET} will fail in some cases simply because the repertoire of T-cells specific to a given antigen is dominated by a single hyperexpanded clonotype.
 \colorbox{yellow!50!white}{Always annotate and check large clonotypes}
