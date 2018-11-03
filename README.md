@@ -30,12 +30,16 @@ install.packages(c(
 
 or install these packages manually.
 
-Download the tutorial by clicking the ``Clone or download`` button above or execute
+Download the tutorial by clicking the ``Clone or download`` button above or executing
 
 ```bash
 git clone https://github.com/antigenomics/sciar-tutorial-2018.git
 ```
 
+Then open the ``tutorial.Rmd`` in RStudio and proceed with executing the R code chunks.
+
 ### Materials
 
-The slides can be found in ``slides/slides.pdf``. For the interactive part open the ``tutorial.Rmd`` file in RStudio.
+* The slides can be found in ``slides/slides.pdf``. For the interactive part open the ``tutorial.Rmd`` file in RStudio.
+
+* The compiled tutorial results are stored in the ``tutorial.pdf``, this file contains the code, comments and plots.
