@@ -36,7 +36,7 @@ Download the tutorial by clicking the ``Clone or download`` button above or exec
 git clone https://github.com/antigenomics/sciar-tutorial-2018.git
 ```
 
-Then open the ``tutorial.Rmd`` in RStudio and proceed with executing the R code chunks.
+Then open the ``tutorial.Rmd`` in RStudio and proceed with executing the R code.
 
 ### Materials
 
