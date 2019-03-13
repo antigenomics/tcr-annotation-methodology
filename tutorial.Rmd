@@ -1,9 +1,8 @@
 ---
-title: 'T-cell repertoire annotation and motif discovery'
-subtitle: 'A RepSeq data analysis tutorial in R'
+title: 'T-cell repertoire sequencing data analysis in R: part II'
 author: 'Mikhail Shugay'
 institute: 'Skolkovo Institute of Science and Technology'
-date: '29 October 2018, 2nd SCAIR meeting'
+date: "28 February 2019, MRC Weatherall Institute"
 output:
   pdf_document: default
   html_document: default
@@ -222,7 +221,7 @@ df.vdjdb.f %>%
              y = count, 
              color = antigen.species)) +
   geom_boxplot(data = df.vdjdb.c,
-               color = "grey", fill = "grey") +
+               color = "grey60", fill = "grey") +
   geom_boxplot(fill = NA) +
   scale_y_log10("# reads") + xlab("") +
   scale_color_brewer("Ag. species", palette = "Set1") +
@@ -281,7 +280,7 @@ df.tcrnet.e %>%
   summarise(count = n())
 ```
 
-Not much correlation between enrichment fold and clonotype frequency
+Some correlation between enrichment fold and clonotype frequency
 
 ```{r}
 # Volcano-like plot
@@ -307,7 +306,7 @@ Compute graph with $1$ substitution allowed. Here we'll use all clonotypes (exce
 
 ```{r}
 # Hamming distance
-find_pairs <- function(x, y) {
+find_pairs <- function(x, y = x) {
   res <- stringdistmatrix(x, y,
                           method = "hamming",
                           useNames = "strings",
@@ -331,7 +330,26 @@ df.tcrnet.e %>%
     ) %>%
   rbindlist -> df.graph
 
+# random graph - top 3000 clonotypes
+df.tcrnet.e %>%
+  .$sample_id %>%
+  unique %>%
+  as.list %>%
+  lapply(function(x)
+    find_pairs(df.tcrnet %>% 
+                 filter(sample_id == x) %>% 
+                 arrange(-count) %>%
+                 head(n = 3000) %>%
+                 .$cdr3aa %>% 
+                 unique) %>%
+      mutate(sample_id = x)
+    ) %>%
+  rbindlist -> df.graph.rnd
+
 df.graph %>%
+  head
+
+df.graph.rnd %>%
   head
 ```
 
@@ -363,7 +381,8 @@ layout_graph <- function(graph) {
 }
 
 # apply to both samples
-df.mds <- df.graph %>%
+compute_mds <- function(graph) {
+  graph %>%
   group_by(sample_id) %>%
   do(layout_graph(.)) %>%
   ungroup %>%
@@ -371,12 +390,29 @@ df.mds <- df.graph %>%
           group_by(cdr3aa, sample_id) %>%
           summarise(freq = sum(freq)),
         by = c("cdr3aa", "sample_id"))
+}
+
+df.mds <- compute_mds(df.graph)
+df.mds.rnd <- compute_mds(df.graph.rnd)
 
 # plot 2D graph layout colored by connected component
-df.mds %>%
+p1 <- df.mds.rnd %>%
   ggplot(aes(x = x, y = y,
-             size = log10(freq))) +
-  geom_point(shape = 21) +
+             size = sqrt(freq))) +
+  geom_point(color = "grey40", alpha = 0.9) +
+  xlab("MDS1") + ylab("MDS2") +
+  scale_size(guide = F) +
+  facet_wrap(~sample_id) +
+  theme_bw() +
+  theme(aspect = 1,
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank())
+p1
+
+p2 <- df.mds %>%
+  ggplot(aes(x = x, y = y,
+             size = sqrt(freq))) +
   geom_point(aes(color = as.integer(factor(cid))), alpha = 0.9) +
   xlab("MDS1") + ylab("MDS2") +
   scale_color_distiller(guide = F, palette = "Set1") +
@@ -387,6 +423,8 @@ df.mds %>%
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
+
+p2
 ```
 
 # Combining TCRNET results and VDJdb annotations
@@ -402,9 +440,9 @@ df.mds.ag.freq <- df.mds %>%
         all.x = T, by = c("cdr3aa", "sample_id"))
 
 # plot graph layout colored by annotation
-ggplot(df.mds.ag.freq %>% filter(!is.na(epi.name)),
+p3 <- ggplot(df.mds.ag.freq %>% filter(!is.na(epi.name)),
        aes(x = x, y = y, color = factor(epi.name), 
-           size = log10(freq)
+           size = sqrt(freq)
            )) +
   geom_point(data = df.mds.ag.freq, color = "grey") +
   geom_point() +
@@ -418,6 +456,14 @@ ggplot(df.mds.ag.freq %>% filter(!is.na(epi.name)),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
+
+p3
+
+pdf("output/clusters.pdf")
+p1
+p2
+p3
+dev.off()
 ```
 
 Get IDs of interesting clusters
