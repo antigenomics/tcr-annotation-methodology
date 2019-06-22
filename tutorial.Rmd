@@ -1,8 +1,8 @@
 ---
-title: 'T-cell repertoire sequencing data analysis in R: part II'
+title: 'T-cell repertoire annotation and motif discovery'
 author: 'Mikhail Shugay'
 institute: 'Skolkovo Institute of Science and Technology'
-date: "28 February 2019, MRC Weatherall Institute"
+date: 2019
 output:
   pdf_document: default
   html_document: default
@@ -167,7 +167,7 @@ df.vdjdb <- df.vdjdb %>%
 Plot all VDJdb annotations
 
 ```{r}
-df.vdjdb %>%
+p1 <- df.vdjdb %>%
   ggplot(aes(x = fct_reorder2(epi.name, 
                               freq,
                               as.integer(as.factor(antigen.species))),
@@ -183,6 +183,19 @@ df.vdjdb %>%
   theme_bw() +
   theme(panel.grid = element_blank(),
         strip.background = element_blank())
+p1
+pdf("output/p1.pdf")
+p1
+dev.off()
+
+df.vdjdb %>%
+  group_by(sample_id, epi.name) %>%
+  filter(n() > 5) %>%
+  do(t.test(log10(.$count), 
+            df.vdjdb.control %>% 
+              filter(epi.name == (.$epi.name)[1]) %>% .$count %>% log10) %>% tidy) %>%
+  mutate(p.value.adj = p.adjust(p.value)) %>%
+  arrange(p.value)
 ```
 
 Zoom in/filter results based on donor HLA haplotype knowledge.
@@ -214,7 +227,7 @@ df.vdjdb.c <- df.vdjdb.control %>%
              )
   )
 
-df.vdjdb.f %>%
+p2 <- df.vdjdb.f %>%
   ggplot(aes(x = fct_reorder2(epi.name, 
                               freq,
                               as.integer(as.factor(antigen.species))),
@@ -230,6 +243,16 @@ df.vdjdb.f %>%
   theme(panel.grid = element_blank(),
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
         strip.background = element_blank())
+p2
+pdf("output/p2.pdf")
+p2
+dev.off()
+
+df.vdjdb.f %>%
+  group_by(sample_id, epi.name) %>%
+  do(t.test(log10(.$count), df.vdjdb.c %>% 
+              filter(epi.name == (.$epi.name)[1]) %>% .$count %>% log10) %>% tidy) %>%
+  mutate(p.value.adj = p.adjust(p.value))
 ```
 
 # Searching for "expanded" TCR groups
@@ -284,8 +307,8 @@ Some correlation between enrichment fold and clonotype frequency
 
 ```{r}
 # Volcano-like plot
-df.tcrnet.e %>%
-  ggplot(aes(x = freq, y = fold, fill = -log10(p.adj))) +
+p3 <- df.tcrnet.e %>%
+  ggplot(aes(x = freq, y = fold, fill = -log10(p.adj + 1e-10))) +
   geom_point(shape = 21) +
   scale_x_log10("Frequency") +
   scale_y_log10("Enrichment fold") +
@@ -294,6 +317,10 @@ df.tcrnet.e %>%
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
         strip.background = element_blank())
+p3
+pdf("output/p3.pdf")
+p3 + theme(aspect = 1)
+dev.off()
 
 df.tcrnet.e %>%
   group_by(sample_id) %>%
@@ -337,7 +364,7 @@ df.tcrnet.e %>%
   as.list %>%
   lapply(function(x)
     find_pairs(df.tcrnet %>% 
-                 filter(sample_id == x) %>% 
+                 filter(sample_id == x, !grepl("[_*]", cdr3aa)) %>% 
                  arrange(-count) %>%
                  head(n = 3000) %>%
                  .$cdr3aa %>% 
@@ -396,7 +423,7 @@ df.mds <- compute_mds(df.graph)
 df.mds.rnd <- compute_mds(df.graph.rnd)
 
 # plot 2D graph layout colored by connected component
-p1 <- df.mds.rnd %>%
+p4 <- df.mds.rnd %>%
   ggplot(aes(x = x, y = y,
              size = sqrt(freq))) +
   geom_point(color = "grey40", alpha = 0.9) +
@@ -408,9 +435,12 @@ p1 <- df.mds.rnd %>%
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
-p1
+p4
+pdf("output/p4.pdf")
+p4 + geom_point(color = "grey40")
+dev.off()
 
-p2 <- df.mds %>%
+p5 <- df.mds %>%
   ggplot(aes(x = x, y = y,
              size = sqrt(freq))) +
   geom_point(aes(color = as.integer(factor(cid))), alpha = 0.9) +
@@ -424,7 +454,10 @@ p2 <- df.mds %>%
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
 
-p2
+p5
+pdf("output/p5.pdf")
+p5 + geom_point(aes(color = as.integer(factor(cid))))
+dev.off()
 ```
 
 # Combining TCRNET results and VDJdb annotations
@@ -440,7 +473,7 @@ df.mds.ag.freq <- df.mds %>%
         all.x = T, by = c("cdr3aa", "sample_id"))
 
 # plot graph layout colored by annotation
-p3 <- ggplot(df.mds.ag.freq %>% filter(!is.na(epi.name)),
+p6 <- ggplot(df.mds.ag.freq %>% filter(!is.na(epi.name)),
        aes(x = x, y = y, color = factor(epi.name), 
            size = sqrt(freq)
            )) +
@@ -457,26 +490,37 @@ p3 <- ggplot(df.mds.ag.freq %>% filter(!is.na(epi.name)),
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
 
-p3
-
-pdf("output/clusters.pdf")
-p1
-p2
-p3
+p6
+pdf("output/p6.pdf")
+p6
 dev.off()
 ```
 
 Get IDs of interesting clusters
 
 ```{r}
-df.mds.ag.freq %>%
-  group_by(cid2) %>%
-  mutate(total = n()) %>%
+cluster.annot.stats <- df.mds.ag.freq %>%
+  group_by(sample_id) %>%
+  mutate(total.sample = n()) %>%
+  group_by(sample_id, epi.name) %>%
+  mutate(total.epi = n()) %>%
+  group_by(sample_id, cid2) %>%
+  mutate(total.cluster = n()) %>%
   filter(!is.na(epi.name)) %>%
-  group_by(cid2, epi.name) %>%
+  group_by(sample_id, cid2, epi.name, total.sample, total.epi, total.cluster) %>%
   # fraction annotated of all nodes in component
-  summarise(fraction.annot = n() / total[1]) %>%
-  arrange(-fraction.annot)
+  summarise(count.matched = n()) %>%
+  arrange(-count.matched) %>%
+  ungroup %>%
+  mutate(fraction.matched = count.matched / total.cluster,
+         fraction.matched.e = total.epi / total.sample) %>%
+  ungroup %>%
+  group_by(sample_id, cid2, epi.name, total.sample, total.epi, total.cluster, fraction.matched) %>%
+  do(binom.test(.$count.matched, .$total.cluster, .$fraction.matched.e) %>% tidy) %>%
+  mutate(p.value.adj = p.adjust(p.value)) %>%
+  arrange(p.value)
+cluster.annot.stats
+cluster.annot.stats %>% fwrite("output/annot.stats.txt", sep = "\t")
 ```
 
 Plotting motifs
@@ -582,20 +626,38 @@ plot_grid(plotlist = plot_cid_full(c("B35+_C1,EBV B*35 EPL",
                                      "CMV+_C11,CMV B*07 TPR",
                                      "CMV+_C13,CMV A*02 NLV")),
           ncol = 3, nrow = 3, align = 'v')
+
+pdf("ms/Fig4d.pdf", width = 7, height = 6)
+plot_grid(plotlist = plot_cid_full(c("B35+_C1,EBV B*35 EPL",
+                                     "CMV+_C11,CMV B*07 TPR",
+                                     "CMV+_C13,CMV A*02 NLV")),
+          ncol = 3, nrow = 3, align = 'v')
+dev.off()
 ```
 
 Something we have missed
 
 ```{r}
-get_top_clonotypes <- function(allele) {
+get_top_clonotypes <- function(sample, allele) {
   df.vdjdb.f %>%
-  filter(sample_id == "CMV+") %>%
-  filter(startsWith(mhc.a, allele)) %>%
-  select(count, freq, cdr3aa) %>%
-  arrange(-count) %>%
-  head(10)
+    filter(sample_id == sample) %>%
+    filter(startsWith(mhc.a, allele)) %>%
+    group_by(mhc.a, cdr3aa) %>%
+    summarise(count = sum(count), freq = sum(freq)) %>%
+    merge(df.mds.ag.freq %>% select(cdr3aa, cid2), all.x = T) %>%
+    arrange(-count) %>%
+    head(10)
 }
 
-get_top_clonotypes("HLA-B*07")
-get_top_clonotypes("HLA-A*02")
+get_top_clonotypes("CMV+", "HLA-A*02")
+get_top_clonotypes("CMV+", "HLA-B*07")
+
+get_top_clonotypes("CMV+", "HLA-A*02") %>%
+  fwrite("output/top_a02.txt", sep = "\t")
+get_top_clonotypes("CMV+", "HLA-B*07") %>%
+  fwrite("output/top_b07.txt", sep = "\t")
+```
+
+```{r}
+#
 ```

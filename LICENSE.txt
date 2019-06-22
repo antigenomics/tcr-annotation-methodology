@@ -1,6 +1,6 @@
-Immune repertoire forensics: a RepSeq data analysis tutorial
+T-cell repertoire annotation and motif discovery tutorial
 
-(c) 2017 Mikhail Shugay
+(c) 2017-2019 Mikhail Shugay
 
 Attribution-ShareAlike 4.0 International
 

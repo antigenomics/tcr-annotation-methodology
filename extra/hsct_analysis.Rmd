@@ -1,0 +1,88 @@
+---
+title: "Extra analysis for HSCT time course"
+author: "M.S."
+date: "4/25/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(data.table)
+library(reshape2)
+library(ggplot2)
+library(ggbeeswarm)
+library(ggrepel)
+select = dplyr::select
+```
+
+Read in samples, clean up and append p-values computed by ALICE
+
+```{r}
+metadata <- data.frame(sample.id = c("minus48months", "4months", "10months", "37months"),
+                       time.point = factor(c("-48mo", "4mo", "10mo", "37mo"), 
+                                           levels = c("-48mo", "4mo", "10mo", "37mo")))
+
+metadata %>%
+  .$sample.id %>%
+  as.list %>%
+  lapply(function(x) fread(paste0('gzcat ', x, ".txt.gz")) %>%
+           mutate(sample.id = x)) %>%
+  rbindlist %>%
+  merge(metadata) -> data
+
+colnames(data) <- c("sample.id", "count", "freq", "cdr3nt", "cdr3aa", "v", "d", "j", "time.point")
+
+data <- data %>%
+  filter(!grepl("[*~]", cdr3aa)) %>%
+  select(-d)
+
+metadata %>%
+  .$sample.id %>%
+  as.list %>%
+  lapply(function(x) fread(paste0("p_vals_", x, ".txt")) %>%
+           mutate(sample.id = x)) %>%
+  rbindlist -> data.p
+
+data.1 <- data %>%
+  merge(data.p %>% select(sample.id,
+                          cdr3nt = CDR3.nucleotide.sequence, 
+                          cdr3aa = CDR3.amino.acid.sequence,
+                          v = bestVGene, j = bestJGene,
+                          D, p_val),
+        by = c("sample.id", "cdr3nt", "cdr3aa", "v", "j"),
+        all.x = T) %>%
+  group_by(sample.id) %>%
+  mutate(D = ifelse(is.na(D), 1, D),
+         p_val = ifelse(is.na(p_val), 1, p_val),
+         p.adj = p.adjust(p_val, method = "BH"))
+```
+
+Plot results
+
+```{r}
+pe1 <- data.1 %>%
+  filter(count > 2) %>%
+  ggplot(aes(x = time.point, y = count, 
+             color = ifelse(p.adj < 0.001, "yes", "no"))) +
+  geom_quasirandom(alpha = 0.7, aes(size = D)) +
+  geom_text_repel(data = data.1 %>%
+                    filter(time.point != "-48mo",
+                           cdr3nt == "TGTGCCAGCAGCTTAGCGCCGGGAGCAACTAATGAAAAACTGTTTTTT"),
+                  label = "A*02-NLV+", min.segment.length = 0, nudge_x = 0.5) +
+  geom_text_repel(data = data.1 %>%
+                    filter(time.point == "-48mo",
+                           cdr3nt == "TGTGCCAGCAGCTTAGCGCCGGGAGCAACTAATGAAAAACTGTTTTTT"),
+                  label = "A*02-NLV+", min.segment.length = 0, nudge_x = -0.5) +
+  geom_vline(xintercept = 1.5, color = "grey40") +
+  annotate(geom = "label", x = 1.5, y = 1000, label = "HSCT", color = "grey40") +
+  scale_y_log10("# reads") +
+  scale_x_discrete("Time point", expand = c(0,1)) +
+  scale_size_continuous("Number of\nneighbors") +
+  scale_color_manual("Enriched", values = c("black", "red")) +
+  theme_bw()
+pe1
+pdf("pe1.pdf", width = 7, height = 4)
+pe1
+dev.off()
+```

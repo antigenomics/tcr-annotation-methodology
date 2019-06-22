@@ -26,9 +26,9 @@
 
 \author{Mikhail Shugay, PhD}
 \title{T-cell repertoire annotation and motif discovery}
-\subtitle{A RepSeq data analysis tutorial in R}
+\subtitle{An AIRR-Seq data analysis tutorial in R}
 \institute[Skoltech]{\texttt {Skolkovo Institute of Science and Technology}}
-\date{29 October 2018, 2\textsuperscript{nd} SCAIR meeting}
+\date{\today}
 
 \begin{document}
 
@@ -37,11 +37,11 @@
 \section{Introduction}
 
 \begin{frame}{Aims of this tutorial}
-\textbf{Aim1} Learn how to infer T-cells specific to certain epitopes and extract T-cell receptor (TCR) sequence motifs from high-throughput sequencing data (RepSeq).\\~\
+\textbf{Aim1} Learn how to infer T-cells specific to certain epitopes and extract T-cell receptor (TCR) sequence motifs from high-throughput sequencing data (AIRR-Seq).\\~\
 
 \textbf{Aim2} Get familiar with \texttt{VDJdb} database, \texttt{VDJtools} software and some useful R templates for TCR sequence analysis.\\~\
 
-\textbf{Disclaimer} This tutorial will not cover RepSeq data processing and basic\footnote{Repertoire diversity analysis, segment usage, etc. See \href{https://vdjtools-doc.readthedocs.io/en/master/examples.html}{\textbf{Examples} section of \texttt{VDJtools} docs} for this.} analysis.
+\textbf{Disclaimer} This tutorial will not cover AIRR-Seq data processing and basic\footnote{Repertoire diversity analysis, segment usage, etc. See \href{https://vdjtools-doc.readthedocs.io/en/master/examples.html}{\textbf{Examples} section of \texttt{VDJtools} docs} for this.} analysis.
 \end{frame}
 
 \begin{frame}{VDJdb database}
@@ -82,7 +82,7 @@ where $c$ is the control sample.
 \section{Setting}
 
 \begin{frame}{Dataset}
-We'll use RepSeq data from Emerson et al. Nat Genet 2017
+We'll use AIRR-Seq data from Emerson et al. Nat Genet 2017
 \begin{table}[]
 \begin{tabular}{lllllll}
 \textbf{Sample} & \textbf{ID} & \textbf{a1} & \textbf{a2} & \textbf{b1} & \textbf{b2} & \textbf{status} \\

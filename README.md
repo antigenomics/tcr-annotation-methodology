@@ -43,3 +43,5 @@ Then open the R markdown template ``tutorial.Rmd`` in RStudio and proceed with e
 * The slides can be found in ``slides/slides.pdf``. For the interactive part open the ``tutorial.Rmd`` file in RStudio.
 
 * The compiled tutorial results are stored in the ``tutorial.pdf``, this file contains the code, comments and plots.
+
+* Additional files and scripts for tracking expansion of CMV+ clonotypes post HSCT treatment are provided in the ``extra/`` folder
