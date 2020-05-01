@@ -2,7 +2,7 @@
 title: 'T-cell repertoire annotation and motif discovery'
 author: 'Mikhail Shugay'
 institute: 'Skolkovo Institute of Science and Technology'
-date: 2019
+date: 2020
 output:
   pdf_document: default
   html_document: default
@@ -134,13 +134,15 @@ df.vdjdb.good <- df.vdjdb %>%
   filter(vdjdb.score == vdjdb.score.max) %>%
   # In case of ties select the one with max # publications
   group_by(cdr3aa) %>%
-  mutate(num.pub = str_count(reference.id, ","),
+  # !!IMPORTANT!! Only count Pubmed papers to select records
+  # otherwise we'll get lots of multiple specificity assignments from 10X
+  mutate(num.pub = str_count(reference.id, "PMID"),
          num.pub.max = max(num.pub)) %>%
   filter(num.pub == num.pub.max) %>%
   # Remove all remaining ambigous cases
   group_by(cdr3aa) %>%
-  mutate(n.epitopes = length(unique(antigen.epitope))) %>%
-  filter(n.epitopes == 1) %>%
+  mutate(num.spec = length(unique(antigen.epitope))) %>%
+  filter(num.spec == 1) %>%
   ungroup
 
 # Apply filter
@@ -191,9 +193,9 @@ dev.off()
 df.vdjdb %>%
   group_by(sample_id, epi.name) %>%
   filter(n() > 5) %>%
-  do(t.test(log10(.$count), 
-            df.vdjdb.control %>% 
-              filter(epi.name == (.$epi.name)[1]) %>% .$count %>% log10) %>% tidy) %>%
+  do(wilcox.test(.$count, 
+                 df.vdjdb.control %>% 
+                   filter(epi.name == (.$epi.name)[1]) %>% .$count) %>% tidy) %>%
   mutate(p.value.adj = p.adjust(p.value)) %>%
   arrange(p.value)
 ```
@@ -250,8 +252,9 @@ dev.off()
 
 df.vdjdb.f %>%
   group_by(sample_id, epi.name) %>%
-  do(t.test(log10(.$count), df.vdjdb.c %>% 
-              filter(epi.name == (.$epi.name)[1]) %>% .$count %>% log10) %>% tidy) %>%
+  do(wilcox.test(.$count, df.vdjdb.c %>% 
+              filter(epi.name == (.$epi.name)[1]) %>% .$count) %>% tidy) %>%
+  ungroup %>%
   mutate(p.value.adj = p.adjust(p.value))
 ```
 
