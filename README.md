@@ -30,10 +30,10 @@ install.packages(c(
 
 or install these packages manually.
 
-Download the tutorial by clicking the ``Clone or download`` button above or executing
+Download the tutorial by clicking the ``Clone or download`` button above or cloning the repository with git
 
 ```bash
-git clone https://github.com/antigenomics/sciar-tutorial-2018.git
+git clone https://github.com/antigenomics/tcr-annotation-methodology.git
 ```
 
 Then open the R markdown template ``tutorial.Rmd`` in RStudio and proceed with executing the R code. For more information on R markdown please visit the [following link](https://rmarkdown.rstudio.com).
